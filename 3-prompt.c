@@ -3,15 +3,15 @@
 
 int main(void)
 {
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t nread;
+    char *line = NULL;          /* pointeur qui va contenir la ligne saisie */
+    size_t buffer_size = 0;     /* taille allouée par getline */
+    ssize_t chars_read;         /* nombre de caractères lus */
 
     while (1)
     {
         printf("$ ");
-        nread = getline(&line, &len, stdin);
-        if (nread == -1)
+        chars_read = getline(&line, &buffer_size, stdin);
+        if (chars_read == -1)   /* EOF (Ctrl+D) ou erreur */
             break;
         printf("%s", line);
     }
