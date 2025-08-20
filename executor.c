@@ -1,11 +1,14 @@
 #include "shell.h"
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 /**
  * execute_command - Executes a single command
  * @command: full path or single-word command
  */
+
+extern char **environ;
 
 void execute_command(const char *command)
 {
@@ -23,7 +26,7 @@ void execute_command(const char *command)
 		argv[0] = (char *)command;
 		argv[1] = NULL;
 
-		execve(command, argv, NULL);
+		execve(command, argv, environ);
 
 
 		perror("Command execution failed");
