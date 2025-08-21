@@ -74,7 +74,7 @@ int main(void)
         free_parse(&shell.parse);
     }
 
-    // Sécurité en sortie
+
     free_input(&shell.input);
     free_parse(&shell.parse);
 
