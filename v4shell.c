@@ -15,7 +15,7 @@ void handle_sigint(int sig)
 int main(void)
 {
     t_shell shell;
-    int exit_status = 0;  // Code de sortie final
+    int exit_status = 0;  
 
     shell.prompt.text = "$ ";
     shell.running = 1;
@@ -48,7 +48,7 @@ int main(void)
             if (strcmp(shell.parse.command, "exit") == 0)
             {
                 shell.running = 0;
-                exit_status = shell.exec.result; // récupérer le code de la dernière commande
+                exit_status = shell.exec.result;
             }
             else if (strcmp(shell.parse.command, "cd") == 0)
             {
@@ -60,7 +60,7 @@ int main(void)
                 }
                 else
                 {
-                    chdir(getenv("HOME")); // cd tout seul → HOME
+                    chdir(getenv("HOME")); 
                     shell.exec.result = 0;
                 }
             }
