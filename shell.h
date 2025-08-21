@@ -14,10 +14,14 @@
 *
 */ 
 
+/* Global environ */
+extern char **environ;
+
+/* Function prototypes */
 void prompt(void);
 void read_command(char *command, size_t size);
-void execute_command(const char *command);
-
-
+int execute_command(char *argv[], char *progname, int cmd_count);
+char *find_command(char *command);
+void print_env(void);
 
 #endif
