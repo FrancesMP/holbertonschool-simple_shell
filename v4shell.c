@@ -21,14 +21,16 @@ int main(void)
     signal(SIGINT, handle_sigint);
 
     while (shell.running)
-    {
+    { 
+        if (isatty(STDIN_FILENO))
         display_prompt(&shell.prompt);
 
-        if (read_input(&shell.input) == -1)
-        {
+    if (read_input(&shell.input) == -1)
+    {
+        if (isatty(STDIN_FILENO))
             printf("\n");
-            break;
-        }
+        break;
+    }
 
         parse_command(&shell.input, &shell.parse);
 
