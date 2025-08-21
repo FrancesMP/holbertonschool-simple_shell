@@ -4,6 +4,14 @@
 #include <stdio.h>
 #include <string.h>
 
+
+void handle_sigint(int sig)
+{
+    (void)sig;          // on ignore le paramètre
+    write(1, "\n$ ", 3); // réaffiche le prompt
+    fflush(stdout);
+}
+
 int main(void)
 {
     t_shell shell;
@@ -11,6 +19,8 @@ int main(void)
     shell.prompt.text = "$ ";
     shell.running = 1;
 
+    signal(SIGINT, handle_sigint);
+    
     while (shell.running)
     {
         display_prompt(&shell.prompt);
@@ -37,6 +47,7 @@ int main(void)
         }
 
         free_input(&shell.input);
+        free_parse(&shell.parse);
     }
 
     return 0;

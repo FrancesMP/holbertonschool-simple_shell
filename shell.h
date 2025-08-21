@@ -12,7 +12,7 @@
 typedef struct s_prompt
 {
     char *text;       
-} t_prompt;
+} t_prompt; 
 
 /* Lecture de la ligne de commande */
 typedef struct s_input
@@ -61,5 +61,5 @@ void execute_command(t_parse *parse, t_execute *exec);
 
 /* Libération de la mémoire */
 void free_input(t_input *input);
-
+void free_parse(t_parse *parse);
 #endif /* SHELL_H */
