@@ -1,9 +1,9 @@
 #include "shell.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 
 void handle_sigint(int sig)
 {
@@ -15,7 +15,7 @@ void handle_sigint(int sig)
 int main(void)
 {
     t_shell shell;
-    int exit_status = 0;  
+    int exit_status = 0;
 
     shell.prompt.text = "$ ";
     shell.running = 1;
@@ -60,7 +60,7 @@ int main(void)
                 }
                 else
                 {
-                    chdir(getenv("HOME")); 
+                    chdir(getenv("HOME"));
                     shell.exec.result = 0;
                 }
             }
@@ -73,7 +73,6 @@ int main(void)
         free_input(&shell.input);
         free_parse(&shell.parse);
     }
-
 
     free_input(&shell.input);
     free_parse(&shell.parse);
