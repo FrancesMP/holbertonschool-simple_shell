@@ -175,14 +175,10 @@ void free_parse(t_parse *parse)
     if (parse->argv)
     {
         for (i = 0; parse->argv[i] != NULL; i++)
-            free(parse->argv[i]);  /* libère chaque argument */
-        free(parse->argv);          /* libère le tableau */
+            free(parse->argv[i]);  /* libère chaque strdup */
+        free(parse->argv);
         parse->argv = NULL;
     }
 
-    if (parse->command)
-    {
-        free(parse->command);       /* libère la commande */
-        parse->command = NULL;
-    }
+    parse->command = NULL;
 }
