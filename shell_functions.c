@@ -191,7 +191,7 @@ char *get_env_value(const char *name)
     {
         if (strncmp(environ[i], name, len) == 0 && environ[i][len] == '=')
         {
-            return environ[i] + len + 1; /* pointeur sur la valeur */
+            return environ[i] + len + 1; 
         }
     }
     return NULL;
