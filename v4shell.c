@@ -3,13 +3,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
+#include <signal.h>
 
 void handle_sigint(int sig)
 {
-    (void)sig;          // on ignore le paramètre
-    write(1, "\n$ ", 3); // réaffiche le prompt
-    fflush(stdout);
+    (void)sig;
+    write(1, "\n$ ", 3); /* Réaffiche le prompt */
 }
 
 int main(void)
@@ -20,7 +19,7 @@ int main(void)
     shell.running = 1;
 
     signal(SIGINT, handle_sigint);
-    
+
     while (shell.running)
     {
         display_prompt(&shell.prompt);
@@ -33,17 +32,22 @@ int main(void)
 
         parse_command(&shell.input, &shell.parse);
 
-        /* commandes simples */
-        if (strcmp(shell.parse.command, "exit") == 0)
-            shell.running = 0;
-        else if (strcmp(shell.parse.command, "cd") == 0)
+        if (shell.parse.command != NULL)
         {
-            if (chdir("/") != 0)
-                perror("cd");
-        }
-        else
-        {
-            execute_command(&shell.parse, &shell.exec);
+            /* commandes internes */
+            if (strcmp(shell.parse.command, "exit") == 0)
+            {
+                shell.running = 0;
+            }
+            else if (strcmp(shell.parse.command, "cd") == 0)
+            {
+                if (chdir("/") != 0)
+                    perror("cd");
+            }
+            else
+            {
+                execute_command(&shell.parse, &shell.exec);
+            }
         }
 
         free_input(&shell.input);
@@ -52,4 +56,3 @@ int main(void)
 
     return 0;
 }
-

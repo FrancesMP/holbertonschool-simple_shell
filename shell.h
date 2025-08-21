@@ -6,10 +6,10 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
-#include <signal.h>
-/*  Structures  */
 
-/*  Affichage du prompt */
+/* ===================== Structures ===================== */
+
+/* Affichage du prompt */
 typedef struct s_prompt
 {
     char *text;       
@@ -23,17 +23,17 @@ typedef struct s_input
     int status;       /* Statut de la lecture */
 } t_input;
 
-/*  Parsing */
+/* Parsing */
 typedef struct s_parse
 {
     char *command;   /* la commande ex: "ls" */
     char **argv;     /* tableau d’arguments ex: {"ls", "-l", NULL} */
 } t_parse;
 
-/*  Exécution  */
+/* Exécution */
 typedef struct s_execute
 {
-    int result;       /* 0 = succès  -1 = erreur */
+    int result;       /* 0 = succès, -1 = erreur */
 } t_execute;
 
 /* Structure globale pour le shell */
@@ -46,7 +46,7 @@ typedef struct s_shell
     int running;      /* Flag pour savoir si le shell continue */
 } t_shell;
 
-/*  Prototypes  */
+/* ===================== Prototypes ===================== */
 
 /* Prompt */
 void display_prompt(t_prompt *prompt);
@@ -54,7 +54,7 @@ void display_prompt(t_prompt *prompt);
 /* Lecture de la commande */
 int read_input(t_input *input);
 
-/* Parsing simple ( pas d'arguments) */
+/* Parsing simple */
 void parse_command(t_input *input, t_parse *parse);
 
 /* Exécution d'une commande simple */
@@ -63,4 +63,5 @@ void execute_command(t_parse *parse, t_execute *exec);
 /* Libération de la mémoire */
 void free_input(t_input *input);
 void free_parse(t_parse *parse);
+
 #endif /* SHELL_H */

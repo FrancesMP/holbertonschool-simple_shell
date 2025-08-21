@@ -1,6 +1,10 @@
 #include "shell.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 extern char **environ;
 
@@ -33,9 +37,12 @@ void free_input(t_input *input)
     }
 }
 
-
 void parse_command(t_input *input, t_parse *parse)
 {
+    size_t len;
+    char *token;
+    int i = 0;
+
     if (input->line == NULL)
     {
         parse->command = NULL;
@@ -44,15 +51,11 @@ void parse_command(t_input *input, t_parse *parse)
     }
 
     /* Remove \n */
-    size_t len = strlen(input->line);
+    len = strlen(input->line);
     if (len > 0 && input->line[len - 1] == '\n')
         input->line[len - 1] = '\0';
 
     /* Découper en tokens (command + args) */
-    char *token = strtok(input->line, " ");
-    int i = 0;
-
-    /* On suppose max 64 arguments */
     parse->argv = malloc(sizeof(char *) * 64);
     if (!parse->argv)
     {
@@ -60,9 +63,16 @@ void parse_command(t_input *input, t_parse *parse)
         exit(EXIT_FAILURE);
     }
 
+    token = strtok(input->line, " ");
     while (token != NULL && i < 63)
     {
-        parse->argv[i++] = strdup(token);
+        parse->argv[i] = strdup(token);
+        if (!parse->argv[i])
+        {
+            perror("strdup");
+            exit(EXIT_FAILURE);
+        }
+        i++;
         token = strtok(NULL, " ");
     }
     parse->argv[i] = NULL; /* NULL-terminated array */
@@ -70,62 +80,26 @@ void parse_command(t_input *input, t_parse *parse)
     parse->command = (i > 0) ? parse->argv[0] : NULL;
 }
 
-
-/* execution simple : fork + execve : (no arg no path) */
-/* void execute_command(t_parse *parse, t_execute *exec)
-{
-    pid_t pid;
-
-    if (parse->command == NULL || parse->command[0] == '\0')
-    {
-        exec->result = -1;
-        return;
-    }
-
-    pid = fork();
-    if (pid < 0)
-    {
-        perror("fork");
-        exec->result = -1;
-        return;
-    }
-
-    if (pid == 0)
-    {
-        / Processus enfant /
-  /       char *args[] = {parse->command, NULL};
-        extern char **environ;
-        if (execve(parse->command, args, environ) == -1)
-        {
-            perror("execve");
-            exit(EXIT_FAILURE);
-        }
-    }
-    else
-    {
-        / Processus parent /
-       / int status;
-        waitpid(pid, &status, 0);
-        exec->result = (WIFEXITED(status)) ? WEXITSTATUS(status) : -1; /
-     }
-}  */
-
 char *find_path(char *command)
 {
-    char *path_env = getenv("PATH");
-    char *token, *full_path;
+    char *path_env;
+    char *path_copy;
+    char *token;
+    char *full_path;
     size_t len;
 
+    path_env = getenv("PATH");
     if (!path_env)
         return NULL;
 
-    char *path_copy = strdup(path_env);  /* strdup car strtok modifie la chaîne */    if (!path_copy)
+    path_copy = strdup(path_env); /* copie car strtok modifie la chaîne */
+    if (!path_copy)
         return NULL;
 
     token = strtok(path_copy, ":");
     while (token)
     {
-        len = strlen(token) + strlen(command) + 2; /*  "/" + '\0' */
+        len = strlen(token) + strlen(command) + 2; /* "/" + '\0' */
         full_path = malloc(len);
         if (!full_path)
         {
@@ -148,7 +122,7 @@ char *find_path(char *command)
     return NULL; /* pas trouvé */
 }
 
-/*execution with args and PATH handling */
+/* execution with args and PATH handling */
 void execute_command(t_parse *parse, t_execute *exec)
 {
     pid_t pid;
@@ -196,10 +170,16 @@ void execute_command(t_parse *parse, t_execute *exec)
 
 void free_parse(t_parse *parse)
 {
+    int i;
+
     if (parse->argv)
     {
-        for (int i = 0; parse->argv[i]; i++)
+        i = 0;
+        while (parse->argv[i])
+        {
             free(parse->argv[i]);
+            i++;
+        }
         free(parse->argv);
         parse->argv = NULL;
     }
