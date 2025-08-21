@@ -15,7 +15,7 @@ void handle_sigint(int sig)
 int main(void)
 {
     t_shell shell;
-    int exit_status = 0;  
+    int exit_status = 0;
 
     shell.prompt.text = "$ ";
     shell.running = 1;
@@ -52,28 +52,27 @@ int main(void)
             }
             else if (strcmp(shell.parse.command, "cd") == 0)
             {
+                int ret;
+
                 if (shell.parse.argv[1])
-                {
-                    if (chdir(shell.parse.argv[1]) != 0)
-                        perror("cd");
-                    shell.exec.result = (chdir(shell.parse.argv[1]) == 0) ? 0 : 1;
-                }
+                    ret = chdir(shell.parse.argv[1]);
                 else
-                {
-                    chdir(getenv("HOME")); 
-                    shell.exec.result = 0;
-                }
+                    ret = chdir(getenv("HOME"));
+
+                if (ret != 0)
+                    perror("cd");
+
+                shell.exec.result = (ret == 0) ? 0 : 1;
             }
             else
             {
-                execute_command(&shell.parse, &shell.exec);
+                shell.exec.result = execute_command(&shell.parse, &shell.exec);
             }
         }
 
         free_input(&shell.input);
         free_parse(&shell.parse);
     }
-
 
     free_input(&shell.input);
     free_parse(&shell.parse);

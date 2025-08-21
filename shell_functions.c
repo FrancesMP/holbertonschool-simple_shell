@@ -50,12 +50,12 @@ void parse_command(t_input *input, t_parse *parse)
         return;
     }
 
-    /* Remove \n */
+    /* Remove newline character */
     len = strlen(input->line);
     if (len > 0 && input->line[len - 1] == '\n')
         input->line[len - 1] = '\0';
 
-    /* Découper en tokens (command + args) */
+    /* Split input into command and arguments */
     parse->argv = malloc(sizeof(char *) * 64);
     if (!parse->argv)
     {
@@ -75,7 +75,7 @@ void parse_command(t_input *input, t_parse *parse)
         i++;
         token = strtok(NULL, " ");
     }
-    parse->argv[i] = NULL; /* NULL-terminated array */
+    parse->argv[i] = NULL;
 
     parse->command = (i > 0) ? parse->argv[0] : NULL;
 }
@@ -92,14 +92,14 @@ char *find_path(char *command)
     if (!path_env)
         return NULL;
 
-    path_copy = strdup(path_env); /* copie car strtok modifie la chaîne */
+    path_copy = strdup(path_env);
     if (!path_copy)
         return NULL;
 
     token = strtok(path_copy, ":");
     while (token)
     {
-        len = strlen(token) + strlen(command) + 2; /* "/" + '\0' */
+        len = strlen(token) + strlen(command) + 2;
         full_path = malloc(len);
         if (!full_path)
         {
@@ -119,39 +119,36 @@ char *find_path(char *command)
     }
 
     free(path_copy);
-    return NULL; /* pas trouvé */
+    return NULL;
 }
 
-/* execution with args and PATH handling */
 int execute_command(t_parse *parse, t_execute *exec)
 {
     pid_t pid;
     int status;
 
-    (void)exec; /* si tu l'utilises pas encore */
+    (void)exec;
 
     pid = fork();
     if (pid == -1)
     {
         perror("fork");
-        return (-1);
+        return -1;
     }
-    else if (pid == 0) /* enfant */
+    else if (pid == 0)
     {
         execvp(parse->command, parse->argv);
-        /* si execvp échoue */
         fprintf(stderr, "./hsh: 1: %s: not found\n", parse->command);
         exit(127);
     }
-    else /* parent */
+    else
     {
         waitpid(pid, &status, 0);
         if (WIFEXITED(status))
             return (WEXITSTATUS(status) == 127 ? -1 : 0);
     }
-    return (0);
+    return 0;
 }
-
 
 void free_parse(t_parse *parse)
 {
@@ -160,13 +157,14 @@ void free_parse(t_parse *parse)
     if (parse->argv)
     {
         for (i = 0; parse->argv[i] != NULL; i++)
-            free(parse->argv[i]);  /* libère chaque strdup */
+            free(parse->argv[i]);
         free(parse->argv);
         parse->argv = NULL;
     }
 
     parse->command = NULL;
 }
+
 char *get_env_value(const char *name)
 {
     int i;
@@ -176,7 +174,7 @@ char *get_env_value(const char *name)
     {
         if (strncmp(environ[i], name, len) == 0 && environ[i][len] == '=')
         {
-            return environ[i] + len + 1; 
+            return environ[i] + len + 1;
         }
     }
     return NULL;
