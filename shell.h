@@ -12,28 +12,28 @@
 /* Affichage du prompt */
 typedef struct s_prompt
 {
-    char *text;       
-} t_prompt; 
+    char *text;
+} t_prompt;
 
 /* Lecture de la ligne de commande */
 typedef struct s_input
 {
-    char *line;       /* Ligne saisie par l'utilisateur */
-    size_t len;       /* Taille de la ligne */
-    int status;       /* Statut de la lecture */
+    char *line;
+    size_t len;
+    int status;
 } t_input;
 
 /* Parsing */
 typedef struct s_parse
 {
-    char *command;   /* la commande ex: "ls" */
-    char **argv;     /* tableau d’arguments ex: {"ls", "-l", NULL} */
+    char *command;
+    char **argv;
 } t_parse;
 
 /* Exécution */
 typedef struct s_execute
 {
-    int result;       /* 0 = succès, -1 = erreur */
+    int result;
 } t_execute;
 
 /* Structure globale pour le shell */
@@ -43,7 +43,7 @@ typedef struct s_shell
     t_input input;
     t_parse parse;
     t_execute exec;
-    int running;      /* Flag pour savoir si le shell continue */
+    int running;
 } t_shell;
 
 /* ===================== Prototypes ===================== */
@@ -64,6 +64,10 @@ int execute_command(t_parse *parse, t_execute *exec);
 void free_input(t_input *input);
 void free_parse(t_parse *parse);
 
+/* Récupération d'une variable d'environnement */
 char *get_env_value(const char *name);
+
+/* Recherche le chemin complet d'une commande */
+char *find_path(char *command);
 
 #endif /* SHELL_H */

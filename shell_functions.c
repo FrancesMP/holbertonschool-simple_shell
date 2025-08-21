@@ -19,13 +19,8 @@ int read_input(t_input *input)
     input->len = 0;
 
     if (getline(&input->line, &input->len, stdin) == -1)
-    {
         return -1;
-    }
-    else
-    {
-        return 0;
-    }
+    return 0;
 }
 
 void free_input(t_input *input)
@@ -39,9 +34,9 @@ void free_input(t_input *input)
 
 void parse_command(t_input *input, t_parse *parse)
 {
-    char *token;
-    int i = 0;
-    size_t len; 
+    int i;
+    size_t len;
+    char *token_local;
 
     if (!input->line)
     {
@@ -50,7 +45,7 @@ void parse_command(t_input *input, t_parse *parse)
         return;
     }
 
-    len = strlen(input->line); 
+    len = strlen(input->line);
     if (len > 0 && input->line[len - 1] == '\n')
         input->line[len - 1] = '\0';
 
@@ -61,28 +56,28 @@ void parse_command(t_input *input, t_parse *parse)
         exit(EXIT_FAILURE);
     }
 
-    token = strtok(input->line, " ");
-    while (token != NULL && i < 63)
+    i = 0;
+    token_local = strtok(input->line, " ");
+    while (token_local != NULL && i < 63)
     {
-        parse->argv[i] = strdup(token);
+        parse->argv[i] = strdup(token_local);
         if (!parse->argv[i])
         {
             perror("strdup");
             exit(EXIT_FAILURE);
         }
         i++;
-        token = strtok(NULL, " ");
+        token_local = strtok(NULL, " ");
     }
     parse->argv[i] = NULL;
     parse->command = parse->argv[0];
 }
 
-
 char *find_path(char *command)
 {
     char *path_env;
     char *path_copy;
-    char *token;
+    char *token_local;
     char *full_path;
     size_t len;
 
@@ -94,17 +89,17 @@ char *find_path(char *command)
     if (!path_copy)
         return NULL;
 
-    token = strtok(path_copy, ":");
-    while (token)
+    token_local = strtok(path_copy, ":");
+    while (token_local)
     {
-        len = strlen(token) + strlen(command) + 2;
+        len = strlen(token_local) + strlen(command) + 2;
         full_path = malloc(len);
         if (!full_path)
         {
             free(path_copy);
             return NULL;
         }
-        snprintf(full_path, len, "%s/%s", token, command);
+        snprintf(full_path, len, "%s/%s", token_local, command);
 
         if (access(full_path, X_OK) == 0)
         {
@@ -113,7 +108,7 @@ char *find_path(char *command)
         }
 
         free(full_path);
-        token = strtok(NULL, ":");
+        token_local = strtok(NULL, ":");
     }
 
     free(path_copy);
@@ -131,13 +126,13 @@ int execute_command(t_parse *parse, t_execute *exec)
         perror("fork");
         return -1;
     }
-    else if (pid == 0) 
+    else if (pid == 0)
     {
         execvp(parse->command, parse->argv);
         fprintf(stderr, "./hsh: 1: %s: not found\n", parse->command);
         exit(127);
     }
-    else 
+    else
     {
         waitpid(pid, &status, 0);
         if (WIFEXITED(status))
@@ -145,8 +140,6 @@ int execute_command(t_parse *parse, t_execute *exec)
     }
     return exec->result;
 }
-
-
 
 void free_parse(t_parse *parse)
 {
@@ -166,14 +159,13 @@ void free_parse(t_parse *parse)
 char *get_env_value(const char *name)
 {
     int i;
-    size_t len = strlen(name);
+    size_t len;
 
+    len = strlen(name);
     for (i = 0; environ[i]; i++)
     {
         if (strncmp(environ[i], name, len) == 0 && environ[i][len] == '=')
-        {
             return environ[i] + len + 1;
-        }
     }
     return NULL;
 }
