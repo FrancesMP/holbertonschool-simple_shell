@@ -39,23 +39,21 @@ void free_input(t_input *input)
 
 void parse_command(t_input *input, t_parse *parse)
 {
-    size_t len;
     char *token;
     int i = 0;
+    size_t len; 
 
-    if (input->line == NULL)
+    if (!input->line)
     {
         parse->command = NULL;
         parse->argv = NULL;
         return;
     }
 
-    /* Remove newline character */
-    len = strlen(input->line);
+    len = strlen(input->line); 
     if (len > 0 && input->line[len - 1] == '\n')
         input->line[len - 1] = '\0';
 
-    /* Split input into command and arguments */
     parse->argv = malloc(sizeof(char *) * 64);
     if (!parse->argv)
     {
@@ -76,9 +74,9 @@ void parse_command(t_input *input, t_parse *parse)
         token = strtok(NULL, " ");
     }
     parse->argv[i] = NULL;
-
-    parse->command = (i > 0) ? parse->argv[0] : NULL;
+    parse->command = parse->argv[0];
 }
+
 
 char *find_path(char *command)
 {
@@ -127,28 +125,28 @@ int execute_command(t_parse *parse, t_execute *exec)
     pid_t pid;
     int status;
 
-    (void)exec;
-
     pid = fork();
     if (pid == -1)
     {
         perror("fork");
         return -1;
     }
-    else if (pid == 0)
+    else if (pid == 0) 
     {
         execvp(parse->command, parse->argv);
         fprintf(stderr, "./hsh: 1: %s: not found\n", parse->command);
         exit(127);
     }
-    else
+    else 
     {
         waitpid(pid, &status, 0);
         if (WIFEXITED(status))
-            return (WEXITSTATUS(status) == 127 ? -1 : 0);
+            exec->result = WEXITSTATUS(status);
     }
-    return 0;
+    return exec->result;
 }
+
+
 
 void free_parse(t_parse *parse)
 {

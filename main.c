@@ -1,9 +1,9 @@
 #include "shell.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 
 void handle_sigint(int sig)
 {
@@ -52,21 +52,21 @@ int main(void)
             }
             else if (strcmp(shell.parse.command, "cd") == 0)
             {
-                int ret;
-
                 if (shell.parse.argv[1])
-                    ret = chdir(shell.parse.argv[1]);
+                {
+                    if (chdir(shell.parse.argv[1]) != 0)
+                        perror("cd");
+                    shell.exec.result = (chdir(shell.parse.argv[1]) == 0) ? 0 : 1;
+                }
                 else
-                    ret = chdir(getenv("HOME"));
-
-                if (ret != 0)
-                    perror("cd");
-
-                shell.exec.result = (ret == 0) ? 0 : 1;
+                {
+                    chdir(getenv("HOME"));
+                    shell.exec.result = 0;
+                }
             }
             else
             {
-                shell.exec.result = execute_command(&shell.parse, &shell.exec);
+                execute_command(&shell.parse, &shell.exec);
             }
         }
 
