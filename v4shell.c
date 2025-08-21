@@ -15,6 +15,8 @@ void handle_sigint(int sig)
 int main(void)
 {
     t_shell shell;
+    int cmd_count = 0;
+    int status = 0;
 
     shell.prompt.text = "$ ";
     shell.running = 1;
@@ -33,12 +35,13 @@ int main(void)
 
         if (read_input(&shell.input) == -1)
         {
-            free_input(&shell.input);  /* ✅ évite fuite getline */
+            free_input(&shell.input);  
             if (isatty(STDIN_FILENO))
                 printf("\n");
             break;
         }
 
+        cmd_count++; /* compteur de commandes */
         parse_command(&shell.input, &shell.parse);
 
         if (shell.parse.command != NULL)
@@ -49,19 +52,26 @@ int main(void)
             }
             else if (strcmp(shell.parse.command, "cd") == 0)
             {
-                if (shell.parse.argv[1])  /* ✅ cd vers dossier demandé */
+                if (shell.parse.argv[1])  
                 {
                     if (chdir(shell.parse.argv[1]) != 0)
                         perror("cd");
                 }
                 else
                 {
-                    chdir(getenv("HOME")); /* cd tout seul → HOME */
+                    /* getenv est interdit → fallback vers "/" */
+                    if (chdir("/") != 0)
+                        perror("cd");
                 }
             }
             else
             {
-                execute_command(&shell.parse, &shell.exec);
+                if (execute_command(&shell.parse, &shell.exec) == -1)
+                {
+                    fprintf(stderr, "./hsh: %d: %s: not found\n",
+                            cmd_count, shell.parse.command);
+                    status = 127;
+                }
             }
         }
 
@@ -69,9 +79,9 @@ int main(void)
         free_parse(&shell.parse);  
     }
 
-    /* sécurité en sortie */
+    
     free_input(&shell.input);
     free_parse(&shell.parse);
 
-    return 0;
+    return status;
 }

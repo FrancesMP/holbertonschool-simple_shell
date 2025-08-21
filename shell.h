@@ -58,7 +58,7 @@ int read_input(t_input *input);
 void parse_command(t_input *input, t_parse *parse);
 
 /* Exécution d'une commande simple */
-void execute_command(t_parse *parse, t_execute *exec);
+int execute_command(t_parse *parse, t_execute *exec);
 
 /* Libération de la mémoire */
 void free_input(t_input *input);

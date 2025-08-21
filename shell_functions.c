@@ -123,50 +123,34 @@ char *find_path(char *command)
 }
 
 /* execution with args and PATH handling */
-void execute_command(t_parse *parse, t_execute *exec)
+int execute_command(t_parse *parse, t_execute *exec)
 {
     pid_t pid;
-    char *full_path;
+    int status;
 
-    if (parse->command == NULL)
-    {
-        exec->result = -1;
-        return;
-    }
-
-    /* Cherche le binaire dans le PATH si besoin */
-    if (strchr(parse->command, '/'))
-        full_path = strdup(parse->command); /* chemin absolu/relatif */
-    else
-        full_path = find_path(parse->command);
-
-    if (!full_path)
-    {
-        fprintf(stderr, "Command not found: %s\n", parse->command);
-        exec->result = -1;
-        return;
-    }
+    (void)exec; /* si tu l'utilises pas encore */
 
     pid = fork();
-    if (pid == 0)
-    {
-        execve(full_path, parse->argv, environ);
-        perror("execve");
-        exit(EXIT_FAILURE);
-    }
-    else if (pid > 0)
-    {
-        wait(NULL);
-        exec->result = 0;
-    }
-    else
+    if (pid == -1)
     {
         perror("fork");
-        exec->result = -1;
+        return (-1);
     }
-
-    free(full_path);
+    else if (pid == 0) /* enfant */
+    {
+        execvp(parse->command, parse->argv);
+        /* si execvp échoue */
+        exit(127);
+    }
+    else /* parent */
+    {
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status))
+            return (WEXITSTATUS(status) == 127 ? -1 : 0);
+    }
+    return (0);
 }
+
 
 void free_parse(t_parse *parse)
 {
