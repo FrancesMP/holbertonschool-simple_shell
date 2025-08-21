@@ -52,7 +52,7 @@ void parse_command(t_input *input, t_parse *parse)
     char *token = strtok(input->line, " ");
     int i = 0;
 
-    /* On suppose max 64 arguments (tu peux mettre + si tu veux) */
+    /* On suppose max 64 arguments */
     parse->argv = malloc(sizeof(char *) * 64);
     if (!parse->argv)
     {
@@ -193,4 +193,16 @@ void execute_command(t_parse *parse, t_execute *exec)
     }
 
     free(full_path);
+}
+
+void free_parse(t_parse *parse)
+{
+    if (parse->argv)
+    {
+        for (int i = 0; parse->argv[i]; i++)
+            free(parse->argv[i]);
+        free(parse->argv);
+        parse->argv = NULL;
+    }
+    parse->command = NULL;
 }
