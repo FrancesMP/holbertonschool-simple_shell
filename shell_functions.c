@@ -140,6 +140,7 @@ int execute_command(t_parse *parse, t_execute *exec)
     {
         execvp(parse->command, parse->argv);
         /* si execvp échoue */
+        fprintf(stderr, "./hsh: 1: %s: not found\n", parse->command);
         exit(127);
     }
     else /* parent */
