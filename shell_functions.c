@@ -88,7 +88,7 @@ char *find_path(char *command)
     char *full_path;
     size_t len;
 
-    path_env = getenv("PATH");
+    path_env = get_env_value("PATH");
     if (!path_env)
         return NULL;
 
@@ -181,4 +181,18 @@ void free_parse(t_parse *parse)
     }
 
     parse->command = NULL;
+}
+char *get_env_value(const char *name)
+{
+    int i;
+    size_t len = strlen(name);
+
+    for (i = 0; environ[i]; i++)
+    {
+        if (strncmp(environ[i], name, len) == 0 && environ[i][len] == '=')
+        {
+            return environ[i] + len + 1; /* pointeur sur la valeur */
+        }
+    }
+    return NULL;
 }

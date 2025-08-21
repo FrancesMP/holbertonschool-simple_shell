@@ -64,4 +64,6 @@ void execute_command(t_parse *parse, t_execute *exec);
 void free_input(t_input *input);
 void free_parse(t_parse *parse);
 
+char *get_env_value(const char *name);
+
 #endif /* SHELL_H */
