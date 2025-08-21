@@ -1,0 +1,109 @@
+.TH SIMPLE_SHELL 1 "August 22, 2025" "1.0" "Simple Shell Manual"
+
+.SH NAME
+hsh \- A minimal UNIX shell for learning command-line basics
+
+.SH SYNOPSIS
+.B The shell is executed by typing ./hsh
+
+.SH DESCRIPTION
+The
+.B hsh
+program is a simple command-line shell written in C. It allows users to type commands, run them, and navigate the filesystem. Each command is read from the user input, parsed into a command name and optional arguments, and executed. 
+
+.PP
+This shell supports a few built-in commands and also allows execution of external programs found in the system
+.B PATH
+. It is designed for educational purposes and demonstrates basic shell mechanics, signal handling, and memory management.
+
+.SH BUILT-IN COMMANDS
+.TP
+.B exit
+Exits the shell immediately. The returned status is the exit code of the last executed command.
+
+.TP
+.B cd [directory]
+Changes the current working directory. If no argument is provided, the shell moves to the user's home directory. If an invalid directory is specified, an error message is printed.
+
+.TP
+.B env
+Display environment variables
+
+.SH EXTERNAL COMMANDS
+Any command available in the PATH environment variable can be run from this shell. hsh searches each directory in PATH to find the executable. If the command is not found, a descriptive error message is displayed.
+
+.SH SIGNALS
+.TP
+.B Ctrl+C (SIGINT)
+Interrupts the current input line and prints a new prompt. The shell does not exit.
+
+.TP
+.B Ctrl+D (EOF)
+Ends the input and exits the shell cleanly.
+
+.SH ENVIRONMENT
+.TP
+.B PATH
+Used by the shell to locate external commands.
+
+.TP
+.B HOME
+Used by
+.B cd
+when no directory is provided.
+
+.SH EXAMPLES
+Here are some usage examples:
+
+.nf
+$ ./hsh
+$ ls -l
+$ cd /tmp
+$ echo "Hello World"
+$ exit
+.fi
+
+.SH MEMORY MANAGEMENT
+This shell allocates memory dynamically for parsing user input and arguments. All memory is freed after executing each command to avoid leaks.
+
+.SH LIMITATIONS
+This shell is minimal and intended for learning. Limitations include:
+
+.TP
+It only supports simple commands without piping, redirection, or chaining (&&, ||).
+
+.TP
+It does not support shell scripting or advanced built-ins beyond
+.B cd
+and
+.B exit
+.
+
+.TP
+Error handling is basic and some unusual cases (like executing commands in directories without write permission) may not be fully reported.
+
+.SH BUGS
+Known issues include:
+
+.TP
+Built-in commands are limited to
+.B cd
+and
+.B exit
+. Features like job control, aliasing, or scripting are not implemented.
+
+.TP
+Long or complex commands may not behave correctly due to minimal input buffering.
+
+.TP
+Advanced error reporting is not included.
+
+.SH HISTORY
+Project created in August 2025. This shell was developed over two weeks by a team of students as a learning exercise in C programming, covering command parsing, process creation, and basic signal handling.
+
+.SH AUTHORS
+Frances, Sedra, and Rebecca
+
+.SH SEE ALSO
+.BR sh (1),
+.BR bash (1)
