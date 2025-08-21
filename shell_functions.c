@@ -119,14 +119,13 @@ char *find_path(char *command)
     if (!path_env)
         return NULL;
 
-    char *path_copy = strdup(path_env); // strdup car strtok modifie la chaîne
-    if (!path_copy)
+    char *path_copy = strdup(path_env);  /* strdup car strtok modifie la chaîne */    if (!path_copy)
         return NULL;
 
     token = strtok(path_copy, ":");
     while (token)
     {
-        len = strlen(token) + strlen(command) + 2; // "/" + '\0'
+        len = strlen(token) + strlen(command) + 2; /*  "/" + '\0' */
         full_path = malloc(len);
         if (!full_path)
         {
@@ -146,7 +145,7 @@ char *find_path(char *command)
     }
 
     free(path_copy);
-    return NULL; // pas trouvé
+    return NULL; /* pas trouvé */
 }
 
 /*execution with args and PATH handling */
