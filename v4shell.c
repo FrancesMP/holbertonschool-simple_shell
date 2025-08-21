@@ -15,8 +15,7 @@ void handle_sigint(int sig)
 int main(void)
 {
     t_shell shell;
-    int cmd_count = 0;
-    int status = 0;
+    int exit_status = 0;  // Code de sortie final
 
     shell.prompt.text = "$ ";
     shell.running = 1;
@@ -25,6 +24,7 @@ int main(void)
     shell.input.status = 0;
     shell.parse.command = NULL;
     shell.parse.argv = NULL;
+    shell.exec.result = 0;
 
     signal(SIGINT, handle_sigint);
 
@@ -35,13 +35,12 @@ int main(void)
 
         if (read_input(&shell.input) == -1)
         {
-            free_input(&shell.input);  
+            free_input(&shell.input);
             if (isatty(STDIN_FILENO))
                 printf("\n");
             break;
         }
 
-        cmd_count++; /* compteur de commandes */
         parse_command(&shell.input, &shell.parse);
 
         if (shell.parse.command != NULL)
@@ -49,39 +48,35 @@ int main(void)
             if (strcmp(shell.parse.command, "exit") == 0)
             {
                 shell.running = 0;
+                exit_status = shell.exec.result; // récupérer le code de la dernière commande
             }
             else if (strcmp(shell.parse.command, "cd") == 0)
             {
-                if (shell.parse.argv[1])  
+                if (shell.parse.argv[1])
                 {
                     if (chdir(shell.parse.argv[1]) != 0)
                         perror("cd");
+                    shell.exec.result = (chdir(shell.parse.argv[1]) == 0) ? 0 : 1;
                 }
                 else
                 {
-                    /* getenv est interdit → fallback vers "/" */
-                    if (chdir("/") != 0)
-                        perror("cd");
+                    chdir(getenv("HOME")); // cd tout seul → HOME
+                    shell.exec.result = 0;
                 }
             }
             else
             {
-                if (execute_command(&shell.parse, &shell.exec) == -1)
-                {
-                    fprintf(stderr, "./hsh: %d: %s: not found\n",
-                            cmd_count, shell.parse.command);
-                    status = 127;
-                }
+                execute_command(&shell.parse, &shell.exec);
             }
         }
 
-        free_input(&shell.input);  
-        free_parse(&shell.parse);  
+        free_input(&shell.input);
+        free_parse(&shell.parse);
     }
 
-    
+    // Sécurité en sortie
     free_input(&shell.input);
     free_parse(&shell.parse);
 
-    return status;
+    return exit_status;
 }
