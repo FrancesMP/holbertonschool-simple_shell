@@ -25,7 +25,8 @@ typedef struct s_input
 /*  Parsing */
 typedef struct s_parse
 {
-    char *command;    /* sans arguments (V1) */
+    char *command;   /* la commande ex: "ls" */
+    char **argv;     /* tableau d’arguments ex: {"ls", "-l", NULL} */
 } t_parse;
 
 /*  Exécution  */

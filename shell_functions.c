@@ -39,20 +39,37 @@ void parse_command(t_input *input, t_parse *parse)
     if (input->line == NULL)
     {
         parse->command = NULL;
+        parse->argv = NULL;
         return;
     }
 
-    /* Removing  \n  */
+    /* Remove \n */
     size_t len = strlen(input->line);
     if (len > 0 && input->line[len - 1] == '\n')
         input->line[len - 1] = '\0';
 
-    parse->command = strdup(input->line);
-    if (parse->command == NULL)
+    /* Découper en tokens (command + args) */
+    char *token = strtok(input->line, " ");
+    int i = 0;
+
+    /* On suppose max 64 arguments (tu peux mettre + si tu veux) */
+    parse->argv = malloc(sizeof(char *) * 64);
+    if (!parse->argv)
     {
-        perror("Erreur allocation parse->command");
+        perror("malloc");
+        exit(EXIT_FAILURE);
     }
+
+    while (token != NULL && i < 63)
+    {
+        parse->argv[i++] = strdup(token);
+        token = strtok(NULL, " ");
+    }
+    parse->argv[i] = NULL; /* NULL-terminated array */
+
+    parse->command = (i > 0) ? parse->argv[0] : NULL;
 }
+
 
 /* execution simple : fork + execve : (no arg no path) */
 /* void execute_command(t_parse *parse, t_execute *exec)
@@ -136,43 +153,31 @@ char *find_path(char *command)
 void execute_command(t_parse *parse, t_execute *exec)
 {
     pid_t pid;
-    char *argv[2];
-    char *full_path = NULL;
+    char *full_path;
 
-    if (!parse->command || strlen(parse->command) == 0)
+    if (parse->command == NULL)
     {
         exec->result = -1;
         return;
     }
 
-/*    Si c'est un chemin absolu ou relatif, on l'utilise directement */
-    if (parse->command[0] == '/' || parse->command[0] == '.')
-    {
-        if (access(parse->command, X_OK) != 0)
-        {
-            fprintf(stderr, "Command not found: %s\n", parse->command);
-            exec->result = -1;
-            return;
-        }
-        full_path = strdup(parse->command);
-    }
+    /* Cherche le binaire dans le PATH si besoin */
+    if (strchr(parse->command, '/'))
+        full_path = strdup(parse->command); /* chemin absolu/relatif */
     else
-    {
         full_path = find_path(parse->command);
-        if (!full_path)
-        {
-            fprintf(stderr, "Command not found: %s\n", parse->command);
-            exec->result = -1;
-            return;
-        }
+
+    if (!full_path)
+    {
+        fprintf(stderr, "Command not found: %s\n", parse->command);
+        exec->result = -1;
+        return;
     }
 
     pid = fork();
     if (pid == 0)
     {
-        argv[0] = full_path;
-        argv[1] = NULL;
-        execve(full_path, argv, environ);
+        execve(full_path, parse->argv, environ);
         perror("execve");
         exit(EXIT_FAILURE);
     }
