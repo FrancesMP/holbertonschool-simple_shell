@@ -1,20 +1,21 @@
 #include "shell.h"
+#include <stdio.h>
 #include <string.h>
+#include <signal.h>
+#include <stdlib.h>
 
 #define MAX_ARGS 64
 #define BUFFER_SIZE 120
 
-/**
- *main - Entry pooint of the simple shell
- *
- *Function runs infinite loop to display prompt
- *It allocates space for the command input
- *
- *Return: Always 0 (success)
- */
+/* Ctrl+C handler */
+void sigint_handler(int sig)
+{
+    (void)sig;
+    write(1, "\n$$$ ", 5); /* Print prompt again */
+    fflush(stdout);
+}
 
 int main(int argc, char **argv)
-
 {
     char line[BUFFER_SIZE];
     char *args[MAX_ARGS];
@@ -24,6 +25,9 @@ int main(int argc, char **argv)
 
     (void)argc;
 
+    /* Set Ctrl+C handler */
+    signal(SIGINT, sigint_handler);
+
     while (1)
     {
         prompt();
@@ -32,6 +36,7 @@ int main(int argc, char **argv)
         if (line[0] == '\0')
             continue;
 
+        /* Split input line into arguments */
         i = 0;
         token = strtok(line, " ");
         while (token && i < MAX_ARGS - 1)
@@ -53,6 +58,7 @@ int main(int argc, char **argv)
             continue;
         }
 
+        /* Execute external command */
         execute_command(args, argv[0], cmd_count);
     }
 
