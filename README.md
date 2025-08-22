@@ -16,7 +16,7 @@ Developed as part of the Holberton School curriculum.
 - Built-ins:
    - `exit` — exits the shell
    - `cd` — changes directory
-   - env` — prints the environment variables
+   - `env` — prints the environment variables
 - Supports interactive mode (line-by-line input) and non-interactive mode (batch execution from a script or pipe)
 
 ## Flowchart
