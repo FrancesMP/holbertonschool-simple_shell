@@ -5,13 +5,25 @@
 #include <unistd.h>
 #include <string.h>
 
-/* Gestion du Ctrl+C */
+
+/**
+ * handle_sigint - Handles Ctrl+C signal
+ * @sig: Signal received
+ *
+ * Return: void
+ */
 void handle_sigint(int sig)
 {
     (void)sig;
     write(1, "\n$ ", 3);
     fflush(stdout);
 }
+
+/**
+ * main - Entry point for the simple shell
+ *
+ * Return: Shell exit status
+ */
 
 int main(void)
 {

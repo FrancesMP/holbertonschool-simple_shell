@@ -8,21 +8,39 @@
 
 extern char **environ;
 
+/**
+ * display_prompt - Prints the shell prompt
+ * @prompt: Pointer to t_prompt structure
+ *
+ * Return: void
+ */
 void display_prompt(t_prompt *prompt)
 {
     printf("%s", prompt->text);
 }
 
+/**
+ * read_input - Reads a line from standard input
+ * @input: Pointer to t_input structure
+ *
+ * Return: 0 on success, -1 on EOF or error
+ */
 int read_input(t_input *input)
 {
     input->line = NULL;
     input->len = 0;
 
     if (getline(&input->line, &input->len, stdin) == -1)
-        return -1;
-    return 0;
+        return (-1);
+    return (0);
 }
 
+/**
+ * free_input - Frees the memory allocated for input line
+ * @input: Pointer to t_input structure
+ *
+ * Return: void
+ */
 void free_input(t_input *input)
 {
     if (input->line != NULL)
@@ -32,6 +50,13 @@ void free_input(t_input *input)
     }
 }
 
+/**
+ * parse_command - Splits input line into command and arguments
+ * @input: Pointer to t_input structure
+ * @parse: Pointer to t_parse structure
+ *
+ * Return: void
+ */
 void parse_command(t_input *input, t_parse *parse)
 {
     int i;
@@ -73,6 +98,12 @@ void parse_command(t_input *input, t_parse *parse)
     parse->command = parse->argv[0];
 }
 
+/**
+ * find_path - Finds the full path of a command using PATH environment
+ * @command: Command name
+ *
+ * Return: Full path string if found, NULL otherwise
+ */
 char *find_path(char *command)
 {
     char *path_env;
@@ -83,11 +114,11 @@ char *find_path(char *command)
 
     path_env = get_env_value("PATH");
     if (!path_env)
-        return NULL;
+        return (NULL);
 
     path_copy = strdup(path_env);
     if (!path_copy)
-        return NULL;
+        return (NULL);
 
     token_local = strtok(path_copy, ":");
     while (token_local)
@@ -97,14 +128,14 @@ char *find_path(char *command)
         if (!full_path)
         {
             free(path_copy);
-            return NULL;
+            return (NULL);
         }
         snprintf(full_path, len, "%s/%s", token_local, command);
 
         if (access(full_path, X_OK) == 0)
         {
             free(path_copy);
-            return full_path;
+            return (full_path);
         }
 
         free(full_path);
@@ -112,9 +143,15 @@ char *find_path(char *command)
     }
 
     free(path_copy);
-    return NULL;
+    return (NULL);
 }
-
+/**
+ * execute_command - Executes a command using fork and execvp
+ * @parse: Pointer to t_parse structure
+ * @exec: Pointer to t_execute structure
+ *
+ * Return: Command exit status
+ */
 int execute_command(t_parse *parse, t_execute *exec)
 {
     pid_t pid;
@@ -124,7 +161,7 @@ int execute_command(t_parse *parse, t_execute *exec)
     if (pid == -1)
     {
         perror("fork");
-        return -1;
+        return (-1);
     }
     else if (pid == 0)
     {
@@ -138,9 +175,15 @@ int execute_command(t_parse *parse, t_execute *exec)
         if (WIFEXITED(status))
             exec->result = WEXITSTATUS(status);
     }
-    return exec->result;
+    return (exec->result);
 }
 
+/**
+ * free_parse - Frees the memory allocated for parse structure
+ * @parse: Pointer to t_parse structure
+ *
+ * Return: void
+ */
 void free_parse(t_parse *parse)
 {
     int i;
@@ -156,6 +199,12 @@ void free_parse(t_parse *parse)
     parse->command = NULL;
 }
 
+/**
+ * get_env_value - Returns the value of an environment variable
+ * @name: Environment variable name
+ *
+ * Return: Pointer to value string, or NULL if not found
+ */
 char *get_env_value(const char *name)
 {
     int i;
@@ -165,7 +214,7 @@ char *get_env_value(const char *name)
     for (i = 0; environ[i]; i++)
     {
         if (strncmp(environ[i], name, len) == 0 && environ[i][len] == '=')
-            return environ[i] + len + 1;
+            return (environ[i] + len + 1);
     }
-    return NULL;
+    return (NULL);
 }
