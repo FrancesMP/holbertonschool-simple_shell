@@ -8,14 +8,21 @@
 #include <sys/wait.h>
 
 /* ===================== Structures ===================== */
-
-/* Affichage du prompt */
+/**
+ * struct s_prompt - Represents the shell prompt
+ * @text: The string to display as the prompt
+ */
 typedef struct s_prompt
 {
     char *text;
 } t_prompt;
 
-/* Lecture de la ligne de commande */
+/**
+ * struct s_input - Stores user input line
+ * @line: The raw input line
+ * @len: Length of the input buffer
+ * @status: Status flag for reading input
+ */
 typedef struct s_input
 {
     char *line;
@@ -23,20 +30,34 @@ typedef struct s_input
     int status;
 } t_input;
 
-/* Parsing */
+/**
+ * struct s_parse - Holds parsed command and arguments
+ * @command: Command to execute
+ * @argv: Array of arguments
+ */
 typedef struct s_parse
 {
     char *command;
     char **argv;
 } t_parse;
 
-/* Exécution */
+/**
+ * struct s_execute - Stores the execution result
+ * @result: Exit status of the executed command
+ */
 typedef struct s_execute
 {
     int result;
 } t_execute;
 
-/* Structure globale pour le shell */
+/**
+ * struct s_shell - Main shell structure
+ * @prompt: Prompt structure
+ * @input: Input structure
+ * @parse: Parse structure
+ * @exec: Execute structure
+ * @running: Flag to control shell loop
+ */
 typedef struct s_shell
 {
     t_prompt prompt;
