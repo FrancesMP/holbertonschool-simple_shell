@@ -8,42 +8,63 @@
 #include <sys/wait.h>
 
 /* ===================== Structures ===================== */
-
-/* Affichage du prompt */
+/**
+ * struct s_prompt - Represents the shell prompt
+ * @text: The string to display as the prompt
+ */
 typedef struct s_prompt
 {
-    char *text;       
-} t_prompt; 
+    char *text;
+} t_prompt;
 
-/* Lecture de la ligne de commande */
+/**
+ * struct s_input - Stores user input line
+ * @line: The raw input line
+ * @len: Length of the input buffer
+ * @status: Status flag for reading input
+ */
 typedef struct s_input
 {
-    char *line;       /* Ligne saisie par l'utilisateur */
-    size_t len;       /* Taille de la ligne */
-    int status;       /* Statut de la lecture */
+    char *line;
+    size_t len;
+    int status;
 } t_input;
 
-/* Parsing */
+/**
+ * struct s_parse - Holds parsed command and arguments
+ * @command: Command to execute
+ * @argv: Array of arguments
+ */
 typedef struct s_parse
 {
-    char *command;   /* la commande ex: "ls" */
-    char **argv;     /* tableau d’arguments ex: {"ls", "-l", NULL} */
+    char *command;
+    char **argv;
 } t_parse;
 
-/* Exécution */
+/**
+ * struct s_execute - Stores the execution result
+ * @result: Exit status of the executed command
+ */
 typedef struct s_execute
 {
-    int result;       /* 0 = succès, -1 = erreur */
+    int result;
 } t_execute;
 
-/* Structure globale pour le shell */
+/**
+ * struct s_shell - Main shell structure
+ * @prompt: Prompt structure
+ * @input: Input structure
+ * @parse: Parse structure
+ * @exec: Execute structure
+ * @running: Flag to control shell loop
+ */
 typedef struct s_shell
 {
     t_prompt prompt;
     t_input input;
     t_parse parse;
     t_execute exec;
-    int running;      /* Flag pour savoir si le shell continue */
+    int running;
 } t_shell;
 
 /* ===================== Prototypes ===================== */
@@ -64,6 +85,10 @@ int execute_command(t_parse *parse, t_execute *exec);
 void free_input(t_input *input);
 void free_parse(t_parse *parse);
 
+/* Récupération d'une variable d'environnement */
 char *get_env_value(const char *name);
+
+/* Recherche le chemin complet d'une commande */
+char *find_path(char *command);
 
 #endif /* SHELL_H */

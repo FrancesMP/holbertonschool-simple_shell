@@ -5,6 +5,13 @@
 #include <unistd.h>
 #include <string.h>
 
+
+/**
+ * handle_sigint - Handles Ctrl+C signal
+ * @sig: Signal received
+ *
+ * Return: void
+ */
 void handle_sigint(int sig)
 {
     (void)sig;
@@ -12,10 +19,17 @@ void handle_sigint(int sig)
     fflush(stdout);
 }
 
+/**
+ * main - Entry point for the simple shell
+ *
+ * Return: Shell exit status
+ */
+
 int main(void)
 {
     t_shell shell;
     int exit_status = 0;
+    ssize_t nread;
 
     shell.prompt.text = "$ ";
     shell.running = 1;
@@ -33,12 +47,19 @@ int main(void)
         if (isatty(STDIN_FILENO))
             display_prompt(&shell.prompt);
 
-        if (read_input(&shell.input) == -1)
+        nread = read_input(&shell.input);
+        if (nread == -1) /* EOF ou erreur */
         {
             free_input(&shell.input);
             if (isatty(STDIN_FILENO))
                 printf("\n");
             break;
+        }
+
+        if (shell.input.line[0] == '\0') /* Ligne vide */
+        {
+            free_input(&shell.input);
+            continue;
         }
 
         parse_command(&shell.input, &shell.parse);
@@ -72,6 +93,9 @@ int main(void)
 
         free_input(&shell.input);
         free_parse(&shell.parse);
+
+        if (!isatty(STDIN_FILENO)) /* Mode non-interactif : sortir après une commande */
+            break;
     }
 
     free_input(&shell.input);
