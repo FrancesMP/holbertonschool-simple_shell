@@ -7,16 +7,16 @@ Developed as part of the Holberton School curriculum.
 ![Logo](https://bashlogo.com/img/logo/jpg/full_colored_light.jpg)
 ## Functionality
 
-- Displays a prompt ($)
-- Executes system commands (e.g., ls, pwd, echo, etc.)
+- Displays a prompt (`$`)
+- Executes system commands (e.g., `ls`, `pwd`, `echo`, etc.)
 - Handles command-line arguments
 - Searches for executables in the system PATH
 - Handles execution errors
 - Signal handling (e.g., Ctrl + C)
 - Built-ins:
-   - exit — exits the shell
-   - cd — changes directory
-   - env — prints the environment variables
+   - `exit` — exits the shell
+   - `cd` — changes directory
+   - env` — prints the environment variables
 - Supports interactive mode (line-by-line input) and non-interactive mode (batch execution from a script or pipe)
 
 ## Flowchart
